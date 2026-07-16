@@ -1,40 +1,51 @@
-# MiMoCode
-.mimocode/
-
-# Keil 编译输出
+# ==================== Keil 编译输出 ====================
 ahd20/MDK-ARM/Objects/
 ahd20/MDK-ARM/Listings/
 ahd20/MDK-ARM/*.dep
 ahd20/MDK-ARM/*.uvguix.*
+ahd20/MDK-ARM/*.uvoptx
 
-# ST官方库（可通过CubeMX重新生成）
+# ==================== ST官方库（CubeMX可重新生成） ====================
 ahd20/Drivers/CMSIS/
 ahd20/Drivers/STM32F1xx_HAL_Driver/
 
-# 参考资料和报告素材
+# ==================== 参考资料/报告素材 ====================
 OneNET资料/
 报告素材/
+*.docx
+*.pptx
+*.pdf
 
-# 临时文件
-*.zip
-*.tmp
-*.bak
-*.mp4
-*.avi
-
-# 大文件（超过GitHub限制）
+# ==================== 大文件（GitHub限制100MB） ====================
 *.apk
 *.apk.*
+*.zip
+*.rar
+*.7z
+*.mp4
+*.avi
+*.mov
+*.mkv
 
-# Windows
+# ==================== 临时文件 ====================
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# ==================== 系统文件 ====================
 Thumbs.db
 Desktop.ini
+.DS_Store
+._*
 
-# Web 前端（不纳入固件仓库）
+# ==================== IDE/编辑器 ====================
+.vscode/
+.idea/
+*.code-workspace
+
+# ==================== 工具生成 ====================
+.mimocode/
 web/
-
-# 报告文档
-*.docx
-
-# 数据库脚本
 _query_db.mjs
