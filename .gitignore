@@ -1,0 +1,40 @@
+# MiMoCode
+.mimocode/
+
+# Keil 编译输出
+ahd20/MDK-ARM/Objects/
+ahd20/MDK-ARM/Listings/
+ahd20/MDK-ARM/*.dep
+ahd20/MDK-ARM/*.uvguix.*
+
+# ST官方库（可通过CubeMX重新生成）
+ahd20/Drivers/CMSIS/
+ahd20/Drivers/STM32F1xx_HAL_Driver/
+
+# 参考资料和报告素材
+OneNET资料/
+报告素材/
+
+# 临时文件
+*.zip
+*.tmp
+*.bak
+*.mp4
+*.avi
+
+# 大文件（超过GitHub限制）
+*.apk
+*.apk.*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Web 前端（不纳入固件仓库）
+web/
+
+# 报告文档
+*.docx
+
+# 数据库脚本
+_query_db.mjs

@@ -1,0 +1,6 @@
+Removed Pin From Net: NetName=PC14 Pin=Y1-4
+Removed Pin From Net: NetName=OSCIN Pin=Y2-4
+Change Component Footprint: Designator=Y1 Old Footprint=MC-306 New Footprint=XTAL-49S DIP
+Change Component Footprint: Designator=Y2 Old Footprint=MC-306 New Footprint=XTAL-49S DIP
+Added Pin To Net: NetName=PC14 Pin=Y1-2
+Added Pin To Net: NetName=OSCIN Pin=Y2-2

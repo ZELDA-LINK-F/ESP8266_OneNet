@@ -1,0 +1,30 @@
+# Keil 编译产物
+MDK-ARM/ahd20/
+MDK-ARM/Objects/
+MDK-ARM/Listings/
+MDK-ARM/RTE/_*/
+MDK-ARM/ahd20.uvguix.*
+MDK-ARM/ahd20.uvguix.19698
+MDK-ARM/*.lst
+MDK-ARM/build_log.txt
+MDK-ARM/EventRecorderStub.scvd
+
+# CubeMX 临时
+.mxproject
+*.crf *.d *.o *.axf *.htm *.map *.lnp *.sct
+*.hex *.bin
+
+# STM 备份
+*._*  # CubeMX 临时备份
+*.dep
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# 临时交付物（不提交）
+_delivery/
