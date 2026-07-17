@@ -47,5 +47,10 @@ Desktop.ini
 
 # ==================== 工具生成 ====================
 .mimocode/
+.opencode/
 web/
 _query_db.mjs
+
+# ==================== Node.js ====================
+onenet_web/node_modules/
+*.log

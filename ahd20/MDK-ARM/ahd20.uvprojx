@@ -413,6 +413,11 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/bsp_LCD_ILI9341.c</FilePath>
             </File>
+            <File>
+              <FileName>app_tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Core/Src/app_tasks.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -512,6 +517,16 @@
               <FileName>aht20.h</FileName>
               <FileType>5</FileType>
               <FilePath>../Drivers/BSP/AHT20/aht20.h</FilePath>
+            </File>
+            <File>
+              <FileName>aht20_soft.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/BSP/AHT20/aht20_soft.c</FilePath>
+            </File>
+            <File>
+              <FileName>aht20_soft.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Drivers/BSP/AHT20/aht20_soft.h</FilePath>
             </File>
           </Files>
         </Group>

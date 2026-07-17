@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OneNET 环境监测</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .title { font-size: 18px; font-weight: 600; }
+    .status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; padding: 4px 10px;
+      background: rgba(255,255,255,0.1); border-radius: 12px;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #888; transition: background 0.3s;
+    }
+    .dot.online { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+    .dot.offline { background: #e74c3c; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px 12px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .card-label { font-size: 13px; opacity: 0.7; margin-bottom: 8px; }
+    .card-value {
+      font-size: 40px; font-weight: 700; line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .card-unit { font-size: 14px; opacity: 0.6; margin-left: 4px; }
+    .card.temperature .card-value { color: #ff7675; }
+    .card.humidity    .card-value { color: #74b9ff; }
+
+    .updated {
+      text-align: center; font-size: 12px; opacity: 0.5;
+      margin-bottom: 12px;
+    }
+
+    .chart {
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 12px;
+    }
+    .chart-title {
+      font-size: 14px; font-weight: 500;
+      padding: 6px 8px; opacity: 0.85;
+    }
+    #chart { width: 100%; height: 240px; }
+
+    @media (max-width: 360px) {
+      .card-value { font-size: 32px; }
+      #chart { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">🌡 OneNET 环境监测</div>
+    <div class="status">
+      <div class="dot" id="dot"></div>
+      <span id="statusText">连接中...</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card temperature">
+      <div class="card-label">🌡 温度</div>
+      <div><span class="card-value" id="temp">--</span><span class="card-unit">°C</span></div>
+    </div>
+    <div class="card humidity">
+      <div class="card-label">💧 湿度</div>
+      <div><span class="card-value" id="hum">--</span><span class="card-unit">%RH</span></div>
+    </div>
+  </div>
+
+  <div class="updated">最后更新：<span id="updatedAt">--</span> · 共 <span id="count">0</span> 条数据</div>
+
+  <div class="chart">
+    <div class="chart-title">📈 实时趋势</div>
+    <div id="chart"></div>
+  </div>
+
+  <script>
+    // ============== WebSocket 客户端 ==============
+    const ws = new WebSocket(`ws://${location.host}/`);
+    const dot      = document.getElementById('dot');
+    const statusTx = document.getElementById('statusText');
+    const tempEl   = document.getElementById('temp');
+    const humEl    = document.getElementById('hum');
+    const updated  = document.getElementById('updatedAt');
+    const countEl  = document.getElementById('count');
+
+    ws.onopen = () => {
+      dot.className = 'dot online';
+      statusTx.textContent = '已连接';
+    };
+    ws.onclose = () => {
+      dot.className = 'dot offline';
+      statusTx.textContent = '已断开';
+    };
+    ws.onerror = () => {
+      dot.className = 'dot offline';
+      statusTx.textContent = '连接错误';
+    };
+    ws.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === 'data') updateUI(msg.latest, msg.history);
+      } catch (e) { console.error('parse fail:', e); }
+    };
+
+    function updateUI(latest, history) {
+      if (latest.temperature != null) tempEl.textContent = latest.temperature.toFixed(1);
+      if (latest.humidity    != null) humEl.textContent  = latest.humidity.toFixed(1);
+      updated.textContent = latest.updated_at || '--';
+      countEl.textContent = history.length;
+      renderChart(history);
+    }
+
+    // ============== ECharts 折线图 ==============
+    const chart = echarts.init(document.getElementById('chart'), null, { renderer: 'canvas' });
+    function renderChart(history) {
+      const option = {
+        backgroundColor: 'transparent',
+        grid: { left: 40, right: 16, top: 16, bottom: 24 },
+        tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.7)', textStyle: { color: '#fff' } },
+        legend: {
+          data: ['温度 °C', '湿度 %RH'],
+          textStyle: { color: '#fff', fontSize: 11 },
+          top: 0, right: 0
+        },
+        xAxis: {
+          type: 'category',
+          data: history.map(p => p.t),
+          axisLine: { lineStyle: { color: 'rgba(255,255,255,0.3)' } },
+          axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, interval: Math.floor(history.length / 6) },
+        },
+        yAxis: [
+          {
+            type: 'value', name: '°C', position: 'left',
+            axisLine: { lineStyle: { color: '#ff7675' } },
+            axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10 },
+            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+          },
+          {
+            type: 'value', name: '%RH', position: 'right',
+            axisLine: { lineStyle: { color: '#74b9ff' } },
+            axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10 },
+            splitLine: { show: false },
+          }
+        ],
+        series: [
+          {
+            name: '温度 °C', type: 'line', yAxisIndex: 0,
+            data: history.map(p => p.temp),
+            smooth: true, symbol: 'none',
+            lineStyle: { color: '#ff7675', width: 2 },
+            areaStyle: { color: 'rgba(255,118,117,0.15)' }
+          },
+          {
+            name: '湿度 %RH', type: 'line', yAxisIndex: 1,
+            data: history.map(p => p.hum),
+            smooth: true, symbol: 'none',
+            lineStyle: { color: '#74b9ff', width: 2 },
+            areaStyle: { color: 'rgba(116,185,255,0.15)' }
+          }
+        ]
+      };
+      chart.setOption(option);
+    }
+
+    // 响应式
+    window.addEventListener('resize', () => chart.resize());
+    // 自动重连
+    setInterval(() => { if (ws.readyState === WebSocket.CLOSED) location.reload(); }, 5000);
+  </script>
+</body>
+</html>
